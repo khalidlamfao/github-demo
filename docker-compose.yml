@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tasks
+    volumes:
+      - ./server/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5432:5432"
+  server:
+    build: ./server
+    restart: always
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/tasks
+      JWT_SECRET: secret
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
