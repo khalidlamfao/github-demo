@@ -16,3 +16,16 @@ This project contains a simple Node.js/React application for managing tasks in r
    npm start
    ```
 4. Open `client/index.html` in a browser.
+
+## Docker Setup
+
+You can also run the database and server using Docker Compose. This will start a
+PostgreSQL container initialized with `server/schema.sql` and launch the Node.js
+API connected to it.
+
+```bash
+docker-compose up
+```
+
+The API will be available on `http://localhost:3001` and will use the database
+defined in the `db` service.
