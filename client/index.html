@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Task Manager</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+      body { font-family: sans-serif; margin: 20px; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/javascript">
+      const { useState, useEffect } = React;
+
+      function App() {
+        const [token, setToken] = useState(null);
+        const [tasks, setTasks] = useState([]);
+        const [title, setTitle] = useState('');
+        const [username, setUsername] = useState('');
+        const [password, setPassword] = useState('');
+
+        useEffect(() => {
+          if (token) {
+            fetchTasks();
+            const socket = io();
+            socket.on('task_created', t => setTasks(prev => [...prev, t]));
+            socket.on('task_updated', t => setTasks(prev => prev.map(p => p.id === t.id ? t : p)));
+            socket.on('task_deleted', ({id}) => setTasks(prev => prev.filter(p => p.id !== id)));
+            return () => socket.disconnect();
+          }
+        }, [token]);
+
+        const fetchTasks = async () => {
+          const res = await axios.get('/api/tasks', { headers: { Authorization: 'Bearer ' + token } });
+          setTasks(res.data);
+        };
+
+        const login = async () => {
+          try {
+            const res = await axios.post('/api/login', { username, password });
+            setToken(res.data.token);
+          } catch {
+            alert('Login failed');
+          }
+        };
+
+        const addTask = async () => {
+          await axios.post('/api/tasks', { title }, { headers: { Authorization: 'Bearer ' + token } });
+          setTitle('');
+        };
+
+        const toggleTask = async (task) => {
+          await axios.put('/api/tasks/' + task.id, { title: task.title, completed: !task.completed }, { headers: { Authorization: 'Bearer ' + token } });
+        };
+
+        const deleteTask = async (task) => {
+          await axios.delete('/api/tasks/' + task.id, { headers: { Authorization: 'Bearer ' + token } });
+        };
+
+        if (!token) {
+          return (
+            <div>
+              <h2>Login</h2>
+              <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+              <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+              <button onClick={login}>Login</button>
+            </div>
+          );
+        }
+
+        return (
+          <div>
+            <h2>Tasks</h2>
+            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="New task" />
+            <button onClick={addTask}>Add</button>
+            <ul>
+              {tasks.map(task => (
+                <li key={task.id}>
+                  <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task)} />
+                  {task.title}
+                  <button onClick={() => deleteTask(task)}>x</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
+</html>
