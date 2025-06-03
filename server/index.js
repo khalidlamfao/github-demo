@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -76,6 +77,12 @@ app.delete('/api/tasks/:id', auth, async (req, res) => {
   await pool.query('DELETE FROM tasks WHERE id=$1 AND user_id=$2', [req.params.id, req.user.id]);
   io.emit('task_deleted', { id: Number(req.params.id) });
   res.json({});
+});
+
+// Serve frontend
+app.use(express.static(path.join(__dirname, '..', 'client')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'client', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3001;

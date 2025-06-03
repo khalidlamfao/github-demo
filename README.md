@@ -15,7 +15,7 @@ This project contains a simple Node.js/React application for managing tasks in r
    npm install
    npm start
    ```
-4. Open `client/index.html` in a browser.
+4. Visit `http://localhost:3001/` in your browser.
 
 ## Docker Setup
 
@@ -27,5 +27,5 @@ API connected to it.
 docker-compose up
 ```
 
-The API will be available on `http://localhost:3001` and will use the database
+The application will be available on `http://localhost:3001` and will use the database
 defined in the `db` service.
