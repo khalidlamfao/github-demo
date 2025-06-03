@@ -12,7 +12,9 @@ services:
     ports:
       - "5432:5432"
   server:
-    build: ./server
+    build:
+      context: .
+      dockerfile: server/Dockerfile
     restart: always
     environment:
       DATABASE_URL: postgres://user:password@db:5432/tasks
