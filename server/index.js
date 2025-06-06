@@ -11,12 +11,31 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
+// Authenticate sockets using the JWT sent during the connection handshake and
+// associate each socket with a user-specific room. Clients should pass their
+// token via the `auth` option when calling `io()` on the frontend.
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (!token) return next(new Error('Unauthorized'));
+  try {
+    socket.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch {
+    next(new Error('Unauthorized'));
+  }
+});
+
 app.use(express.json());
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 io.on('connection', socket => {
-  console.log('client connected');
+  // Each socket joins a room based on the authenticated user's id so that
+  // task events can be targeted to the proper recipient only.
+  if (socket.user?.id) {
+    socket.join(`user:${socket.user.id}`);
+    console.log('client connected', socket.user.username);
+  }
 });
 
 function auth(req, res, next) {
@@ -61,7 +80,8 @@ app.post('/api/tasks', auth, async (req, res) => {
   const { title } = req.body;
   const result = await pool.query('INSERT INTO tasks(user_id,title,completed) VALUES($1,$2,false) RETURNING *', [req.user.id, title]);
   const task = result.rows[0];
-  io.emit('task_created', task);
+  // Emit to the room of the task owner so only their sockets receive the event
+  io.to(`user:${task.user_id}`).emit('task_created', task);
   res.json(task);
 });
 
@@ -69,13 +89,15 @@ app.put('/api/tasks/:id', auth, async (req, res) => {
   const { title, completed } = req.body;
   const result = await pool.query('UPDATE tasks SET title=$1, completed=$2 WHERE id=$3 AND user_id=$4 RETURNING *', [title, completed, req.params.id, req.user.id]);
   const task = result.rows[0];
-  io.emit('task_updated', task);
+  // Send update to sockets associated with the task owner
+  io.to(`user:${task.user_id}`).emit('task_updated', task);
   res.json(task);
 });
 
 app.delete('/api/tasks/:id', auth, async (req, res) => {
   await pool.query('DELETE FROM tasks WHERE id=$1 AND user_id=$2', [req.params.id, req.user.id]);
-  io.emit('task_deleted', { id: Number(req.params.id) });
+  // Notify the task owner only
+  io.to(`user:${req.user.id}`).emit('task_deleted', { id: Number(req.params.id) });
   res.json({});
 });
 
