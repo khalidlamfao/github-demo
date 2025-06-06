@@ -3,6 +3,7 @@
 Single page application built with React via CDN. Works with the backend in ../server.
 After starting the server, open http://localhost:3001/ in your browser.
 
-The HTML page attempts to load Babel from https://unpkg.com. If that fails,
-it automatically falls back to the bundled `babel.min.js`, allowing the app to
-work offline once the files have been downloaded.
+The HTML page attempts to load Babel from https://unpkg.com. If the CDN is
+unavailable, a small script detects that `window.Babel` is undefined and
+dynamically loads the bundled `babel.min.js` so the app still works offline
+after the first install.
