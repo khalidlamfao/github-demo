@@ -27,7 +27,7 @@
         useEffect(() => {
           if (token) {
             fetchTasks();
-            const socket = io();
+            const socket = io({ auth: { token } });
             socket.on('task_created', t => setTasks(prev => [...prev, t]));
             socket.on('task_updated', t => setTasks(prev => prev.map(p => p.id === t.id ? t : p)));
             socket.on('task_deleted', ({id}) => setTasks(prev => prev.filter(p => p.id !== id)));
