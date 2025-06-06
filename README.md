@@ -15,8 +15,11 @@ This project contains a simple Node.js/React application for managing tasks in r
    npm install
    npm start
    ```
-4. Visit `http://localhost:3001/` in your browser.
-5. The client HTML loads Babel from https://unpkg.com, so an internet connection is required.
+4. Visit `http://localhost:3001/` in your browser. The login page now includes
+   a **Create Account** button for registering new users.
+5. The client HTML loads Babel from https://unpkg.com and, if that fails, a
+   small script detects the failure and dynamically loads a bundled copy. This
+   allows the app to work offline after the first install.
 
 ## Docker Setup
 
