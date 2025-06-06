@@ -24,3 +24,9 @@ services:
       - "3001:3001"
     depends_on:
       - db
+  web:
+    image: nginx:alpine
+    volumes:
+      - ./client:/usr/share/nginx/html:ro
+    ports:
+      - "3000:80"
