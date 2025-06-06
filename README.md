@@ -30,3 +30,8 @@ docker-compose up
 
 The application will be available on `http://localhost:3001` and will use the database
 defined in the `db` service.
+
+## License
+
+This project is released under the [MIT License](LICENSE).
+
