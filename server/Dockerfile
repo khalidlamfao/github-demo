@@ -1,8 +1,6 @@
-FROM node:18
-WORKDIR /app/server
-COPY server/package.json ./package.json
+FROM node:20
+WORKDIR /app
+COPY . .
 RUN npm install --production
-COPY server .
-COPY client ../client
 EXPOSE 3001
-CMD ["npm", "start"]
+CMD ["node", "index.js"]

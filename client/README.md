@@ -1,12 +1,12 @@
-# Task Manager Frontend
+# React + Vite
 
-Single page application built with React via CDN. Works with the backend in ../server.
-After starting the server, open http://localhost:3001/ in your browser. The login
-screen lets you create an account if you don't already have one.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+Currently, two official plugins are available:
 
-The HTML page attempts to load Babel from https://unpkg.com. If the CDN is
-unavailable, a small script detects that `window.Babel` is undefined and
-dynamically loads the bundled `babel.min.js` so the app still works offline
-after the first install.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
