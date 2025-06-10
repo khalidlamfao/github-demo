@@ -4,6 +4,13 @@ const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const http = require('http');
 const { Server } = require('socket.io');
+const username = process.env.DB_USERNAME;
+const password = process.env.DB_PASSWORD;
+const host = process.env.DB_HOST;
+const dbName = process.env.DB_NAME;
+
+const connectionString = `postgresql://${username}:${password}@${host}:5432/${dbName}`;
+
 
 const app = express();
 const server = http.createServer(app);
